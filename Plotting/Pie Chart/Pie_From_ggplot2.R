@@ -1,11 +1,22 @@
 library(ggplot2)
-a <- read.table("PIE1.txt")
-A1 <- a[,1]
-A2 <- a[,2]
-PIElabel <- paste(A1," ",A2,"%",sep="")
-PIEvalue <-data.frame(Percentage = round(A2/sum(A2)*100,1),Type=PIElabel,percent=PIElabel)
-#pie <- ggplot(PIEvalue,aes(x="",y=PIElabel,fill=Type))+geom_bar(width=15)
-plot <- ggplot(a,
-        aes(x="",y=PIElabel,fill="Type"))
-plot = plot + geom_bar(width=15)
-plot = plot + coord_polar("y")
+
+folder_inputData <- "D:/Programming/R/DataSource/"
+filename_inputData <- "PIE1.txt"
+path_inputData <- paste(folder_inputData, filename_inputData, sep = "")
+inputData <- read.table(path_inputData)
+#colnames(inputData) <- c("nameList", "valueList")
+
+nameList <- inputData[,1]
+valueList <- inputData[,2]
+chartData <- data.frame(nameList, valueList)
+
+chartData$nameList <- factor(nameList, levels = chartData[order(-chartData[,2]),][,1])
+labelList <- paste(nameList," ",valueList,"%",sep = "")
+
+labelPos <- cumsum(valueList) - valueList/2
+
+pieChart <- ggplot(chartData, aes(x=factor(1), y= valueList , fill = nameList)) +
+            geom_bar(width = 1, stat = "identity") +
+            geom_text(aes(x=factor(1.7),y=labelPos,label = labelList)) +
+            coord_polar(theta = "y")
+pieChart
